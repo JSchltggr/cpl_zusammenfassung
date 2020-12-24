@@ -1,0 +1,154 @@
+%! Author = Joel Schaltegger, Marius Zindel, Philipp Emmenegger, Simon Hager
+%! Date = 05.10.20
+%! Version = 1.0
+
+% define documentclass
+\documentclass[a4paper, oneside, 10pt]{scrartcl}
+
+% use language german
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english, german]{babel} % comment out to switch to english
+\usepackage{lmodern} % use modern latin fonts
+
+% format page
+\usepackage{geometry}
+\geometry{top=2.54cm,left=2.54cm,right=2.54cm}
+
+% enable BibTex
+%\usepackage[autostyle=true]{csquotes}
+\usepackage[block=ragged]{biblatex}
+
+\bibliographystyle{ieeetr}
+
+
+% autor
+\usepackage{authblk}
+
+% tabular
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{colortbl}
+
+% math
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{enumitem}
+
+% graphic
+\usepackage{graphicx}
+\graphicspath{{media/}}
+
+% colors
+\usepackage[dvipsnames]{xcolor}
+
+% Multi Columns
+\usepackage{multicol}
+
+%Use lorem ipsum
+\usepackage{lipsum}
+
+% Enable clickable table of contents
+\usepackage{hyperref}
+\hypersetup{
+colorlinks,
+linkcolor={black},
+citecolor={blue!50!black},
+urlcolor={blue!80!black}
+}
+
+% compact items
+\setlist{topsep=0pt, leftmargin=4mm, nolistsep}
+\setlength{\parindent}{0cm}
+
+% define header and footer portrait
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setkomafont{pagehead}{\normalfont}
+\setkomafont{pagefoot}{\normalfont}
+\fancyhf{}
+\fancyhead[LO]{\nouppercase\leftmark}
+\fancyhead[RO]{Joel Schaltegger}
+\fancyfoot[CO]{Seite \thepage}
+\renewcommand{\headrulewidth}{.5pt}
+\renewcommand{\footrulewidth}{.5pt}
+
+% define header and footer landscape
+\fancypagestyle{lscape}{%
+\fancyhf{} % clear all header and footer fields
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+}
+
+%define section color and size
+\addtokomafont{section}{\color{sectioncolor}}
+\addtokomafont{subsection}{\color{subsectioncolor}}
+\addtokomafont{subsubsection}{\small \color{subsubsectioncolor}}
+
+%define color
+\definecolor{sectioncolor}{RGB}{0, 0, 0}
+\definecolor{subsectioncolor}{RGB}{0, 0, 0}
+\definecolor{subsubsectioncolor}{RGB}{0, 0, 0}
+\definecolor{bluekeywords}{rgb}{0,0,1}
+\definecolor{greencomments}{rgb}{0,0.5,0}
+\definecolor{redstrings}{rgb}{0.64,0.08,0.08}
+
+\definecolor{p}{RGB}{0, 43, 54} % Dark page color
+\definecolor{t}{RGB}{131, 148, 150} % Dark text color
+
+\definecolor{RoyalBlue}{RGB}{1, 101, 163} % for code
+\definecolor{DarkPurple}{rgb}{0.4, 0.1, 0.4}
+\definecolor{LightLime}{rgb}{0.3, 0.5, 0.4}
+
+\definecolor{OSTPink}{RGB}{140,25,95}
+\definecolor{h}{RGB}{140,25,95} %Default color for highlighting
+
+\definecolor{workalongGreen}{RGB}{42,141,148}
+
+\definecolor{tableGreen}{RGB}{56,170,56}
+
+% Code Listings
+\usepackage{listings}
+\usepackage{color}
+\usepackage{beramono}
+
+% new section -> new page
+\let\stdsection\section
+\renewcommand\section{\clearpage\stdsection}
+
+% Custom commands
+\newcommand{\AUTHOR}{Joel Schaltegger}
+\newcommand{\INSTITUTE}{Hochschule für Technik Rapperswil}
+
+%dotted rule
+\usepackage{dashrule}
+\usepackage{tikz}
+\usetikzlibrary{decorations.markings}
+\newcommand{\drule}[3][0]{
+\tikz[baseline]{\path[decoration={markings,
+mark=between positions 0 and 1 step 2*#3
+with {\node[fill, circle, minimum width=#3, inner sep=0pt, anchor=south west] {};}},postaction={decorate}]  (0,#1) -- ++(#2,0);}}
+
+%no indentation
+\setlength{\parindent}{0cm}
+
+%no subsubsection number
+\setcounter{secnumdepth}{2}
+
+%no subsubsection in table of contents
+\setcounter{tocdepth}{2}
+
+% Produce landscape pages in a portrait document.
+\usepackage{lscape}
+\usepackage{pdflscape}
+
+% Degree symbol
+\usepackage{textcomp}
+
+% Insert PDF's
+\usepackage{pdfpages}
+
+% globaly small URL
+\renewcommand{\UrlFont}{\ttfamily\small}
