@@ -152,3 +152,47 @@ with {\node[fill, circle, minimum width=#3, inner sep=0pt, anchor=south west] {}
 
 % globaly small URL
 \renewcommand{\UrlFont}{\ttfamily\small}
+
+% Code Listing
+\lstset{
+xleftmargin=0pt,
+xrightmargin=0pt,
+framexleftmargin=0pt,
+framexrightmargin=0pt,
+basicstyle={\fontsize{10pt}{12pt}\ttfamily},
+columns=flexible,
+keepspaces=true,
+showstringspaces=false,
+commentstyle=\color{greencomments},
+keywordstyle=\bfseries \color{OSTPink},
+directivestyle=\color{Maroon},
+stringstyle=\color{RoyalBlue},
+identifierstyle=\color[rgb]{0.1,0.1,0.1},
+}
+
+\lstdefinestyle{frame}{
+framextopmargin=2pt,
+framexbottommargin=2pt,
+aboveskip=1em,
+belowskip=0em,
+frame=tb,
+}
+
+\lstdefinestyle{linenumbers}{
+xleftmargin=20pt,
+framexleftmargin=20pt,
+numbers=left,
+numbersep=10pt,
+numberstyle={\fontsize{9pt}{11pt}\selectfont\color{gray}},
+}
+
+\lstdefinelanguage
+[Custom]{C}
+[Ansi]{C}
+{
+morekeywords={},
+morekeywords=[2]{printf},
+morecomment=[s][keywordstyle3]{/*}{*/},
+keywordstyle=[2]{\color[rgb]{0.4,0.4,0.1}},
+keywordstyle=[3]{\bfseries\color[rgb]{0,0.3,0.2}},
+}

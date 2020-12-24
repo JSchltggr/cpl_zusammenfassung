@@ -1,7 +1,54 @@
 %! Author = joels
 %! Date = 24/12/2020
 
-\section{Woche01}
+\section{Introduction to C++}
+% Goals:
+% You become motivated to learn C++
+% You get familiar with the basics of C++
+% You understand how the C++ toolchain processes header and source files
+% You can setup a Cevelop project with separated unit tests and executable for a library
+% You understand how declarations and definitions work in C++
+% You can explain the value semantics of C++
 
+In C++ gibt es keinen Garbage Collector, wie man es aus anderen Sprachen, wie Java oder C\# kennt. Warnung: Wenn Code \dq falsch\dq geschrieben wurde, kann \textcolor{red}{Undefined Behavior} auftreten.
 
+\subsection{C++ Compilation Process}
+\subsubsection{*.cpp Files}
+\begin{itemize}
+    \item Also called Implementation File
+    \item For function implementations (can be in .h as well)
+    \item Source of compilation
+\end{itemize}
+\subsubsection{*.h File}
+\begin{itemize}
+    \item Also called Header File
+    \item Declarations and definitions to be used in other implementation files
+\end{itemize}
 
+\subsubsection{3 Phases of compilation}
+\begin{itemize}
+    \item Preprocessor Textual replacement of preprocessor directives (#include)
+    \item Compiler Translation of C++ code into machine code (source file to object file)
+    \item Linker Combination of object files and libraries into libraries and executables
+\end{itemize}
+
+\subsection{Declarations and Definitions}
+All things with a name that you use in a C++ program must be declared before you can do so.
+
+\subsubsection{One Definition Rule}
+While a program element can be declared several times without problem there can be only one definition of it. This is called the \textbf{One Definition Rule} (ODR)!
+
+\subsubsection{Include Guard}
+Include guards ensure that a header file is only included once. Multiple inclusions could violate the One Definition Rule when the header contains definitions.
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#ifndef SAYHELLO_H_
+#define SAYHELLO_H_
+
+#include <iosfwd>
+struct Greeter { /* Some Code */ };
+
+#endif /* SAYHELLO_H_ */
+\end{lstlisting}
+
+%TODO: Eventuell Heap/Stack (Folien 42 ff.) --> könnte auch in spätererm kapitel kommen
