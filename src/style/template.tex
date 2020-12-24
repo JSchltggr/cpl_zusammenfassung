@@ -159,7 +159,7 @@ xleftmargin=0pt,
 xrightmargin=0pt,
 framexleftmargin=0pt,
 framexrightmargin=0pt,
-basicstyle={\fontsize{10pt}{12pt}\ttfamily},
+basicstyle={\fontsize{8pt}{8pt}\ttfamily},
 columns=flexible,
 keepspaces=true,
 showstringspaces=false,
@@ -195,4 +195,9 @@ morekeywords=[2]{printf},
 morecomment=[s][keywordstyle3]{/*}{*/},
 keywordstyle=[2]{\color[rgb]{0.4,0.4,0.1}},
 keywordstyle=[3]{\bfseries\color[rgb]{0,0.3,0.2}},
+}
+
+% Subitem with bullet
+\newcommand{\SubItem}[1]{
+{\setlength\itemindent{15pt} \item[-] #1}
 }
