@@ -1,4 +1,78 @@
 %! Author = joels
 %! Date = 24/12/2020
 
-\section{Woche06}
+\section{Namespaces and Enums}
+% You can to group and structure names into namespaces
+% You can resolve function calls using Argument Dependent Lookup
+% You can create enumerations as simple types with few values
+% You know how to implement your own arithmetic type and are aware of possible amibiguities
+
+\subsection{Namespaces}
+\begin{itemize}
+    \item Namespaces are scopes for grouping and preventing name clashes
+    \item Global namespace has the :: prefix
+    \item Nesting of namespaces is possible
+    \item Nesting of scopes allows hiding names
+    \item Anonymous namespaces (without a name) are only accessible in the current file
+    \item Keyword \textcolor{blue}{using} to use a defined namespace in your file.\\
+    E.g: after typing \textbf{using std::string;} you can write: \textbf{string s$\{$\dq my string\dq$\}$;}
+\end{itemize}
+
+\subsubsection{Argument Dependent Lookup}
+When the compiler encounters an unqualified function or operator call with an argument of a user defined type it looks into the namespace in which that type is defined to resolve the function/operator.
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+namespace one {                                  #include "adl.h"
+    struct type_one{};
+    void f(type_one) { /* ... */ } /* 1 */       int main() {
+}                                                    one::type_one t1{};
+                                                     f(t1); // Function 1
+namespace two {                                      two::type_two t2{};
+struct type_two{};                                   f(t2); // Function 2
+    void f(type_two) { /* ... */ } /* 2 */           h(t1); // No Function found
+    void g(one::type_one) { /* ... */ } /* 3 */      two::g(t1); // Function 3
+    void h(one::type_one) { /* ... */ } /* 4 */      g(t1); // No Function found
+}                                                    //(5 gefunden, aber arg passt nicht)
+void g(two::type_two) { /* ... */ } /* 5 */          g(t2) // Function 5
+\end{lstlisting}
+
+\subsection{Enums}
+\begin{itemize}
+    \item Enumerations are useful to represent types with only a few values
+    \item An enumeration creates a new type that can easily be converted to an integral type unscoped enumeration only)
+    \item The individual values (enumerators) are specified in the type
+    \item Unless specified explicitly, the values start with 0 and increase by 1
+\end{itemize}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// Unscoped enumeration
+enum DayOfWeek {
+    Mon, Tue, Wed, Thu, Fri, Sat, Sun
+};   0    1    2    3    4    5    6
+// Implicit conversion:
+int day = Sun;
+
+// Scoped enumeration (class keyword)
+enum class DayOfWeek {
+    Mon, Tue, Wed, Thu, Fri, Sat, Sun
+};   0    1    2    3    4    5    6
+// No implicit conversion to int, requires static_cast:
+int day = static_cast<int>(DayOfWeek::Sun);
+
+// Conversion from int to enum always requires a static_cast:
+DayOfWeek tuesday = static_cast<DayOfWeek>(1);
+\end{lstlisting}
+\vspace{0.3cm}
+\textbf{$\rightarrow$ Beispiel im Anhang unter Woche06}
+
+\subsection{Arithmetic Types}
+\begin{itemize}
+    \item Arithmetic types must be equality comparable
+    \item Boost can be used to get != operator $\rightarrow$ boost::equality\_comparable
+    \item It might be convenient to have the output operator
+    \item Result must be in a specific range (Modulo)
+\end{itemize}
+\vspace{0.3cm}
+\textbf{$\rightarrow$ Beispiel im Anhang unter Woche06}
+
+
+%TODO: Ring Implementation in Anhang

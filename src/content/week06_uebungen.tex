@@ -1,0 +1,48 @@
+%! Author = joels
+%! Date = 25/12/2020
+
+%TODO: Ring Implementation
+
+% Enumeration Example aus Vorlesung (Slide 28)
+\subsection{Übungen Woche 06}
+\subsubsection{Enumeration Example}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// statemachine.h
+#ifndef STATEMACHINE_H_
+#define STATEMACHINE_H_
+
+struct Statemachine {
+    Statemachine();
+    void processInput(char c);
+    bool isDone() const;
+private:
+    enum class State : unsigned short;
+    State theState;
+};
+
+#endif /* STATEMACHINE_H_ */
+
+// statemachine.cpp
+#include "Statemachine.h"
+#include <cctype>
+enum class Statemachine::State : unsigned short {
+    begin, middle, end
+};
+Statemachine::Statemachine()
+    : theState {State::begin} {}
+void Statemachine::processInput(char c) {
+    switch (theState) {
+        case State::begin:
+            if (!isspace(c)) { theState = State::middle; }
+            break;
+        case State::middle:
+            if (isspace(c)) { theState = State::end; }
+            break;
+        case State::end:
+        break; // ignore input
+    }
+}
+bool Statemachine::isDone() const {
+    return theState == State::end;
+}
+\end{lstlisting}
