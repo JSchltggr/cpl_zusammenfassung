@@ -1,4 +1,140 @@
 %! Author = joels
 %! Date = 24/12/2020
 
-\section{Woche05}
+\section{Classes and Operators}
+% You can implement your own data types
+% You know the elements a class consists of
+% You know how to overload operators for classes
+% You know the correct way to read and print objects
+
+\subsection{Classes}
+\begin{itemize}
+    \item A class defines a new type
+    \item A class is usually defined in a header file
+    \item At the end of a class definition a semicolon is required
+    \item Include guard in header file
+    \item Keyword: \textcolor{blue}{calss} or \textcolor{blue}{struct}
+        \SubItem{Default visibility: Class: private, struct: public}
+    \item Access specifiers:
+        \SubItem{private: visible only inside the class; for hidden data members}
+        \SubItem{protected: also visible nin subclasses}
+        \SubItem{public: visible everywhere; for the interface of the class}
+    \item Constructor: Initializer list for member initialization
+\end{itemize}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#ifndef DATE_H_                               #include "Date.h"
+#define DATE_H_
+class Date {                                  Date::Date(int year, int month, int day)
+    int year, month, day;                       : year {year}, month {month}, day {day} {
+public:                                         /* ... */
+    Date(int year, int month, int day);       }
+
+    static bool isLeapYear(int year);         bool Date::isLeapYear(int year) {
+                                                /* ... */
+private:                                      }
+    bool isValidDate() const;                 bool Date::isValidDate() const {
+};                                              /* ... */ }
+#endif /* DATE_H_ */                          }
+\end{lstlisting}
+
+\subsubsection{Special Constructors}
+\begin{itemize}
+    \item Default Constructor
+        \SubItem{No parameters. Implicitly available if there are no other explicit constructors. Has to initialize member variables with default values.}
+    \item Copy Constructor
+        \SubItem{Has one $<$own-type$>$ const \& parameter. Implicitly available (unless there is an explicit move constructor or assignment operator). Copies all member variables.}
+    \item Move Constructor
+        \SubItem{Has one $<$own-type$>$ \&\& parameter. Implicitly available (unless there is an explicit copy constructor or assignment operator). Moves all memebers}
+    \item Typeconversation Constructor
+        \SubItem{Has one $<$other-type$>$ const \& parameter. Converts the input type if possible. Declare explicit to avoid unexpected conversions.}
+    \item Initializer List Constructor
+        \SubItem{Has one std::initializer\_list parameter. Does not need to be explicit, implicit conversion is usually desired. Initializer List constructors are preferred if a variable is initialized with $\{$ $\}$}
+    \item Destructor
+        \SubItem{Named like the default constructor but with a $\sim$. Must release all resources. Implicitly available. Must not throw an exception. Called automatically at the end of the block for local instances.}
+\end{itemize}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+class Date {
+public:
+    Date(int year, int month, int day);
+    Date(); // Default-Constructor
+    Date(Date const &); // Copy-Constructor
+    Date(Date &&); // Move-Constructor
+    explicit Date(std::string const &); // Typeconversation-Constructor
+    Date(std::initializer_list<Element> elements); // Initializer List-Constructor
+    ~Date(); // Destructor
+};
+\end{lstlisting}
+
+\subsection{Operator Overloading}
+\begin{itemize}
+    \item Custom operators can be overloaded for user-defined types.
+    \item Declared like a function, with a special name: \textcolor{blue}{$<$returntype$>$ operator op($<$parameters$>$);}
+    \item Non-Overloadable Operators: \textcolor{red}{::} , \textcolor{red}{.*} , \textcolor{red}{.} , \textcolor{red}{?:}
+    \item Keyword \textcolor{blue}{inline} when defined in header file. But: Problem with private varaibles.\\
+    $\rightarrow$ Define operator in class
+\end{itemize}
+\textcolor{blue}{std::tie} creates a tuple and binds the argument with lvalue references. \textcolor{blue}{std::tuple} provides comparison operators: \textcolor{blue}{==} , \textcolor{blue}{!=} , \textcolor{blue}{$<$} , \textcolor{blue}{$<$=} , \textcolor{blue}{$>$} , \textcolor{blue}{$>$=}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+class Date {
+    int year, month, day; // private 
+
+    bool operator<(Date const & rhs) const {
+        return year < rhs.year ||
+            (year == rhs.year && (month < rhs. month ||
+                (month == rhs.month && day == rhs.day)));
+    }
+};
+
+// With std::tie
+#include <tuple>
+bool operator<(Date const & rhs) const {
+        return std::tie(year, month, day) < std::tie(rhs.year, rhs.month, rhs.day);
+}
+
+// Sending Date to std::ostream
+class Date {
+    int year, month, day;
+public:
+    std::ostream & print(std::ostream & os) const {
+        os << year << "/" << month << "/" << day;
+        return os;
+    }
+};
+inline std::ostream & operator<<(std::ostream & os ,Date const & date) {
+    return date.print(os);
+}
+
+// Reading Date from std::istream
+class Date {
+    int year, month, day;
+public:
+    std::istream & read(std::istream & is) {
+        // Logic for reading values and verifying correctness
+        return is;
+    }
+};
+inline std::istream & operator>>(std::istream & is, Date & date) {
+    return date.read(is);
+}
+
+/* Keyword friend, um Kapselung zwischen private/public zu brechen. --> Dann ist es möglich die read/print Operatoren ohne inline Hilfsfunktionen zu schreiben. */
+// Header File:
+class Date {
+    int year, month, day;
+public:
+    friend std::istream & operator>>(std::istream & is, Date & date);
+    friend std::ostream & operator<<(std::ostream & os, Date const & date);
+};
+// .cpp File:
+std::istream & operator<<(std::istream & is, Date & date) {
+    // read logic
+    return is;
+}
+std::ostream & operator<<(std::ostream & os, Date const & date) {
+    // print logic
+    return os;
+}
+\end{lstlisting}
+
