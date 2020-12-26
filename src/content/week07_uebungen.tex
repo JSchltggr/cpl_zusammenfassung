@@ -27,3 +27,102 @@ int main() {
     }
 }
 \end{lstlisting}
+
+\subsubsection{Example Code using std::set}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#include <set>
+#include <iostream>
+
+void filterVowels(std::istream & in, ostream & out) {
+    std::set const vowels{'a', 'e', 'o', 'u', 'i', 'y'};
+    char c{};
+    while (in >> c) {
+        if (!vowels.count(c)) { // returns 0 (false) or 1 (true)
+            out << c;
+        }
+    }
+}
+int main () {
+    filterVowels(std::cin, std::cout);
+}
+\end{lstlisting}
+
+\subsubsection{Example Code using std::map}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// Example 1
+void countVowels(std::istream &in, ostream &out) {
+    std::map<char, size_t> vowels{{'a', 0}, {'e', 0}, 'i', 0}, {'o', 0}, {'u', 0}, {'y', 0}};
+    char c{};
+    while (in >> c) {
+        if (vowels.count(c)) { // only count those chars that are already in the map
+        ++vowels[c];
+            for_each(cbegin(vowels), cend(vowels), [&out](auto const & entry) {
+                // entry is a pair<char, size_t>
+                out << entry.first << " = " << entry.second << '\n';
+            });
+        }
+    }
+}
+
+// Example 2
+void countStrings(std::istream & in, std::ostream & out) {
+    std::map<std::string, size_t> occurrences{};
+    std::istream_iterator<std::string> inputBegin{in};
+    std::istream_iterator<std::string> inputEnd{};
+    for_each(inputBegin, inputEnd, [&occurrences](auto const & str) {
+        ++occurrences[str]; // inserts new entry with value 1, if not existst, else: counts ++
+    });
+    for(auto const & occurrence : occurrences) {
+        out << occurrence.first << " = " << occurrence.second << '\n'
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Example Code using std::multiset}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+void sortedStringList(std::istream & in, std::ostream & out) {
+    using inIter = std::istream_iterator<std::string>;
+    using outIter = std::ostream_iterator<std::string>;
+    std::multiset<std::string> words{inIter{in}, inIter{}};
+    copy(cbegin(words), cend(words), outIter(out, "\n"));
+    auto current = cbegin(words);
+    while (current != cend (words)) {
+        auto endOfRange = words.upper_bound(*current);
+        copy(current, endOfRange, outIter{out, ", "});
+        out << '\n'; // next range on new line
+        current = endOfRange;
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Example Code using std::unordered\_set}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#include <algorithm>
+#include <iostream>
+#include <iterator>
+#include <unordered_set>
+
+int main () {
+    std::unordered_set<char> const vowels{'a', 'e', 'i', 'o', 'u'};
+    using in = std::istreambuf_iterator<char>;
+    using out = std::ostreambuf_iterator<char>;
+    remove_copy_if(in{std::cin}, in{}, out{std::cout}, [&](char c) {
+        return vowels.count(c);
+    });
+}
+\end{lstlisting}
+
+\subsubsection{Example Code using std::unordered\_map}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#include <unordered_map>
+#include <iostream>
+#include <string>
+int main() {
+    std::unordered_map<std::string, int> words{};
+    std::string s{};
+    while (std::cin >> s) { ++words[s]; }
+    for (auto const & p : words) {
+        std::cout << p.first << " = " << p.second << '\n';
+    }
+}
+\end{lstlisting}
