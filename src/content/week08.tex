@@ -14,8 +14,7 @@ Why should we use Algorithms?
     \item Readability: Applying the correct algorithm expresses your intention much better than a loop
     \item Performance: Algorithms might perform better than handwritten loops
 \end{itemize}
-\subsection{Algorithm Basics}
-\subsubsection{Functor}
+\subsection{Functor}
 A functor is a type (class) that provides a call operator: operator().
 \begin{lstlisting}[style=frame, style= linenumbers, language=C]
 struct Accumulator {
@@ -58,7 +57,7 @@ logical_or<> (||)                           equal_to<> (==)
                                             greater<> (>)
                                             not_equal_to<> (!=)
 \end{lstlisting}
-\subsubsection{Algorithm Examples}
+\subsection{Algorithm Examples}
 \begin{itemize}
     \item transform: Lambda, function or functor for map
     \item merge: ranges must to be sorted
@@ -68,6 +67,9 @@ logical_or<> (||)                           equal_to<> (==)
     \item \_n versions: algorithm is related to a number (e.g: instead of last iterator)
         \SubItem{\textcolor{blue}{search\_n, copy\_n, fill\_n, generate\_n, for\_each\_n}}
 \end{itemize}
+
+\pagebreak
+
 \begin{lstlisting}[style=frame, style= linenumbers, language=C]
 // transform
 // combined contains: | "ggg" | "" | "u" | "yyyy" | "" | "oo" |

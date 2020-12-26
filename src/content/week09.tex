@@ -2,3 +2,73 @@
 %! Date = 24/12/2020
 
 \section{Function Templates}
+% You can explain the difference between Java Generics and C++ Templates
+% You can implement simple generic functions
+% You can implement variadic generic functions
+% You can describe the type concepts required by a function template
+
+\subsection{Templates Syntax}
+\begin{itemize}
+    \item Keyword \textcolor{blue}{template} for declaring a template
+    \item Template parameter list: Contains one or more template parameters
+        \SubItem{A template parameter is a placeholder for a type, which can be used within the template as a type}
+        \SubItem{A type template parameter is introduced with the typename (or class ) keyword}
+\end{itemize}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// min.h
+template <typename T>
+T min(T left, T right) {
+    return left < right ? left : right;
+}
+
+// smaller.cpp
+#include "min.h"
+#include <iostream>
+int main() {
+    int first;
+    int second;
+    if (std::cin >> first >> second) {
+        auto const smaller = min(first, second);
+        std::cout<< "Smaller of "<< first<< " and "<< second<< " is: "<< smaller<< '\n';
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Template Definition}
+\begin{itemize}
+    \item Templates are usually defined in a header file. They are implicitly \textcolor{blue}{inline}
+    \item The definition in a source file is possible, but then it can only be used in that translation unit
+    \item Type checking happens twice: When the template is defined, when template is instantiated (used)
+\end{itemize}
+
+\subsection{Variadic Templates}
+\begin{itemize}
+    \item For function templates with an arbitrary number of parameters
+    \item Needs at least one pack parameter
+    \item Pack Expansion: For each argument in that pack an instance of the pattern is created
+    \item In an instance of the pattern the parameter pack name is replaced by an argument of the pack
+    \item Needs a base case for the recursion (after the last parameter is done, it would call the function without a parameter, which is invalid) $\rightarrow$ Base case must be written before the template function.
+\end{itemize}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+void printAll() { } // Base Case
+template<typename First, typename...Types>
+void printAll(First const & first, Types const &... rest) {
+    std::cout << first;
+    if (sizeof...(Types))
+        std::cout << ", ";
+    }
+    printAll(rest...);
+}
+\end{lstlisting}
+
+\subsection{Overloading}
+Problem: Wenn Pointer als Argument übergeben werden, werden die Pointer-Adressen miteinander verglichen und nicht die Objekte selbst.\\
+Lösung: Mehrere function templates mit dem Selben Namen können existieren. Spezifischere/Normale Funktionen werden den function templates aber bevorzugt.
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// other template function in min.h
+template <typename T>
+    T * min(T * left, T * right) {
+        return *left < *right ? left : right;
+}
+\end{lstlisting}
