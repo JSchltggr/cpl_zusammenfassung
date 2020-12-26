@@ -1,0 +1,108 @@
+%! Author = joels
+%! Date = 26/12/2020
+
+\subsection{Übungen Woche 10}
+
+\subsubsection{Adapting Standard Containers}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+template<typename T>
+struct safeVector : std::vector<T> {
+    using container = std::vector<T>;
+    using container::container; // or using std::vector<T>::vector; --> Inherits constructors with using
+    using size_type = typename container::size_type; // Type Alias
+    using reference = typename container::reference; // Type Alias
+    using const_reference = typename container::const_reference; // Type Alias
+
+    reference operator[](size_type index) {
+        return this->at(index); // this-> for member access
+    }
+
+    const_reference operator[](size_type index) const {
+        return this->at(index);
+    }
+    // should also provide front/back with empty() check
+};
+\end{lstlisting}
+
+\subsubsection{Template Sack}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// sack.h
+template<typename T> // Class template with one typename parameter
+class Sack {
+    using SackType = std::vector<T>; // Alias type: SackType
+    using size_type = typename SackType::size_type; // Dependent name: size_type
+    SackType theSack{};
+
+public:
+    bool empty() const {
+        return theSack.empty{};
+    }
+    size_type size() const {
+        return theSack.size();
+    }
+    void putInto(T const & item) {
+        theSack.push_back(item);
+    }
+    T getOut(); // Member function forward declaration
+};
+
+template <typename T> // implementing member function outside of a class
+inline T Sack<T>::getOut() {
+    if (empty()) {
+        throw std::logic_error{"Empty Sack"};
+    }
+    auto index = static_cast<size_type>(rand() % size()); // Pick random element
+    T retval{theSack.at(index)};
+    theSack.erase(theSack.begin() + index);
+    return retval;
+}
+\end{lstlisting}
+
+\subsubsection{Extending Sack$<$T$>$}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+template <typename T>
+class Sack {
+    //...
+public:
+    Sack() = default; // Retain default constructor
+
+    // Add constructor template for iterators
+    template <typename Iter>
+    Sack(Iter begin, Iter end) : theSack(begin, end) {}
+
+    // Add constructor for initializer_list
+    Sack(std::initializer_list<T> values) : theSack(values) {}
+
+    // Add constructor for Deduction Guide
+    Sack(size_type n, T const & value) : theSack(n, value) {}
+
+    // extracting a std::vector<T> from a Sack<T>
+    template <typename Elt>
+	explicit operator std::vector<Elt>() const {
+		return std::vector<Elt>(theSack.begin(),theSack.end());
+    }
+
+};
+
+// User Provided Deduction Guide for Sack<T> (after template definition)
+template <typename Iter>
+Sack(Iter begin, Iter end) -> Sack<typename std::iterator_traits<Iter>::value_type>;
+\end{lstlisting}
+
+\subsubsection{Template/Default/Non-Type Template Parameter}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// A template can take templates as parameters
+template<typename T, template<typename...> typename Container> // ... for unspecified amount of parameters
+class Sack;
+
+// with default argument:
+template<typename T, template<typename...> typename Container = std::vector>
+class Sack;
+
+// Templates can have non type parameters
+template <typename T, auto n>
+auto average(std::array<T, n> const & values) {
+    auto sumOfValues = accumulate(begin(values), end(values), 0);
+    return sumOfValues / n;
+}
+\end{lstlisting}

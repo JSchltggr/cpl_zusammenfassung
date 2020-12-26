@@ -7,3 +7,59 @@
 % You can explain certain pittfalls when using STL algorithms
 % You can explain the signature of a standard algorithm
 % You can write programs that correctly use standard algorithms
+
+A class template provides a type with compile-time parameters.\\
+$\rightarrow$ Data members can depend on template parameters.\\
+$\rightarrow$ Function members are template functions with the class' template parameters
+
+\subsubsection{Rules}
+\begin{itemize}
+    \item Define class templates completely in header files
+    \item Member functions of class templates: Either in class template directly, or as inline function template in the same header file
+    \item When using language elements depending directly or indirectly on a template parameter, you must
+    specify typename when it is naming a type
+    \item static member variables of a template class can be defined in header without violating ODR, even
+    if included in several compilation units
+\end{itemize}
+
+\subsubsection{Type Aliases \& Dependent Names}
+\begin{itemize}
+    \item It is common for template definitions to define type aliases in order to ease their use
+    \item Within the template definition you might use names that are directly or indirectly depending on the
+    template parameter.
+    \item Dependent Name: Compiler geht standardmässig davon aus, dass es sich im eine Variable, oder eine Funktion hanelt. Wenn es ein Typ ist (wie size\_type), muss das keyword \textcolor{blue}{typename} verwendet werden.
+\end{itemize}
+
+\subsubsection{Members Outside of Class Template}
+Must have: template declaration, keyword inline, member signature, template ID as namescope.\\
+$\rightarrow$ Example im Anhang
+
+\subsubsection{Class Template that Inherit}
+Rule: Always use this-$>$variable (or className::) to refer to inherited members in a template class.
+
+\subsubsection{Template (Partial) Specialization}
+partial: still using a template parameter, but provide (some) arguments\\
+Explicit: providing all arguments with concrete types.\\
+$\rightarrow$ Must declare non-specialized template first. Most specialized version that fits is used.
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// Partial Specialization               Explicit Specialization
+template <typename T>                   template <>
+struct Sack<T *>;                       struct Sack<char const *>;
+
+// Prevent Creation of Sack<int *> --> Delete Destructor
+template <typename T>
+struct Sack<T *> {
+    ~Sack() = delete;
+}
+\end{lstlisting}
+
+\subsubsection{Extending Sack$<$T$>$}
+\textbf{Implementation im Anhang Kapitel Übungen Woche 10}\\
+\begin{itemize}
+    \item Create a Sack$<$T$>$ using iterators to fill it
+    \item Create a Sack$<$T$>$ of multiple default values
+    \item Create a Sack$<$T$>$ from initializer list
+    \item Obtain copy of contents in a std::vector (for iteration and inspection)
+    \item Auto-deducting T for a Sack$<$T$>$ from initializer list $\rightarrow$ User Provided Deduction Guides
+    \item Allow to vary the type of the container to be used
+\end{itemize}
