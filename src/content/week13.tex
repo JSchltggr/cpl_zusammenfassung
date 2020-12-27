@@ -1,4 +1,226 @@
 %! Author = joels
 %! Date = 24/12/2020
 
-\section{Woche13}
+\section{Initialization and Aggregates}
+% You can recognize and name different kinds of initialization
+% You can explain the constraints imposed on aggregate types
+% You can implement aggregate classes
+
+\subsection{Kinds of Initialization}
+\subsubsection{Default Initialization}
+\begin{itemize}
+    \item Simplest form of initialization
+    \begin{itemize}
+        \item Simply dont provide an initializer
+        \item Effect depends on the kind of entity we declare
+        \item Does not work for references
+    \end{itemize}
+    \item Danger: when using default initialized entities
+    \item Does not necessarily work with \textit{const}
+    \item \textbf{Static values:}
+    \begin{itemize}
+        \item Zero initialized first
+        \item then their type's default constructor is called
+    \end{itemize}
+    \item \textbf{Non-Static integral and floating point variables:}
+    \begin{itemize}
+        \item Unitialized
+    \end{itemize}
+    \item \textbf{Objects of class types:}
+    \begin{itemize}
+        \item Constructed using their default constructor
+    \end{itemize}
+    \item \textcolor{red}{Danger:} Reading an unitialized value incurs undefined behaviour
+\end{itemize}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+int global_variable; // implicitly static = 0, kein default ctor
+
+void di_function() {
+    static long local_static;
+    long local_variable; // unitialized
+    std::string local_text; // default ctor
+}
+
+struct di_class {
+    di_class() = default;
+    char member_variable; // not in ctor init list, default init
+};
+\end{lstlisting}
+
+\subsubsection{Value Initialization}
+\begin{itemize}
+    \item Initialization performed with empty () or \{\}
+    \begin{itemize}
+        \item \{\} is prefferable, works in more cases
+    \end{itemize}
+    \item Invoked the default constructor for class types
+\end{itemize}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+void vi_function() {
+    int number{}; // 0
+    std::vector<int> data {}; // default ctor
+    std::string actually_a_function(); // DANGER! may be a function declaration, use {}
+}
+\end{lstlisting}
+
+\subsubsection{Direct Initialization}
+\begin{itemize}
+    \item Similar to Value Initialization
+    \item Uses non-empty () or \{\}
+    \begin{itemize}
+        \item prefer \{\}
+    \end{itemize}
+    \item When using \{\} only applies if not a class type
+    \item \textcolor{red}{Danger}: most vexing parse lurks with ()
+\end{itemize}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+void diri_function() {
+    int number{32};
+    std::string text { "CPl" }; // passender ctor
+    // zweideutig, direct initialization / function declaration, use {}
+    word vexing (std::string());
+}
+\end{lstlisting}
+
+\pagebreak
+
+Most Vexing Parse:
+\begin{itemize}
+    \item Two interpretations:
+    \begin{itemize}
+        \item Initialization with a value-initialized string
+        \item Declaration of a function returning a word and taking an unnamed pointer to a function returning a string
+    \end{itemize}
+    \item The compiler interprets the second option (function declaration)
+    \item Therefore prefer \{\}
+\end{itemize}
+
+\subsubsection{Copy Initialization}
+\begin{itemize}
+    \item Initialization using =
+    \item If the object has class type and the right hand side has the same type
+    \begin{itemize}
+        \item If right hand side is a temporary, the object is constructed in-place, not copied
+        \item otherwise the copy ctor is invoked
+    \end{itemize}
+    \item Otherwise, a suitable conversion sequence is searched for
+    \item Also applies to return statements and throw/catch
+\end{itemize}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+std::string string_factory() { retzrb ""; }
+
+void ci_function() {
+    std::string in_place = string_factory();
+    std::string copy = in_place;
+    std::string converted = "CPl";
+}
+\end{lstlisting}
+
+\subsubsection{List Initialization}
+\begin{itemize}
+    \item Uses non-empty \{\}
+    \item Direct List Initialization
+    \item Copy List Initialization
+    \item Constructors are selected in two phases
+    \begin{itemize}
+        \item If there is a suitable ctor taking \textit{std::initializer\_list}, it is selected
+        \item Otherwise, a suitable ctor is searched
+    \end{itemize}
+\end{itemize}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// Direct List Initialization
+std::string direct { "CPl" };
+// Copy List Initialization
+std::string copy = { "CPlA" };
+\end{lstlisting}
+
+\subsubsection{List Initialization Pitfall}
+\begin{itemize}
+    \item Since \textit{std::initializer\_list} ctor is preffered, you might run into trouble
+\end{itemize}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// vector(size_type count, const T& value, const Allocator& alloc = Allocator());
+
+int ouch() {
+    std::vector<int> data{ 10, 42 }; // list initialization, size() = 2
+    std::vector<ing> data2( 10, 42 ); // other ctor, size() = 10
+
+    return data[5]; // DANGER, undefined behaviour
+}
+\end{lstlisting}
+
+\pagebreak
+
+\subsection{Aggregates}
+\begin{itemize}
+    \item Simple class types
+    \begin{itemize}
+        \item Can have other types as public base classes
+        \item Can have member variables and functions
+        \item Must not have user-provided, inherited or explicit constructors
+        \item Must not have protected or private direct members
+    \end{itemize}
+    \item Mostly used for \textit{simple} types
+    \begin{itemize}
+        \item No invariant that has to be established
+        \item Example: Data Transfer Objects
+    \end{itemize}
+    \item Arrays are also Aggregates
+\end{itemize}
+
+\subsubsection{Aggregate Initialization}
+\begin{itemize}
+    \item Special case of List Initialization
+    \item If more elements than members are given, the program is ill-formed
+    \item Can also provide less initializers than there are bases and members
+    \begin{itemize}
+        \item If the uninitialized members habe a member initializer, it is used
+        \item otherwise they are initialized from empty lists
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Example}
+
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+struct person {
+    std::string name;
+    int age{42};
+
+    bool operator<(person const & other) const {
+        return age < other.age;
+    }
+
+    void write(std::ostream & out) const {
+        out << name << ": " << age << "\n";
+    }
+};
+
+int main() {
+    person rudolf{"Rudolf", 32};
+    person mike{"Mike Schmid"}; // Age will be set to 42
+    rudolf.write(std::cout);
+}
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
