@@ -32,12 +32,12 @@ std::deque is like std::vector but with additional, efficient front insertion/re
     \includegraphics[scale=0.43]{deque.png}
 \end{center}
 \subsubsection{std::list$<$T$>$ $\rightarrow$ \#include$<$list$>$}
-Efficient insertion in any position. Lower efficiency in bulk operations. Requires member function call for sort etc. Only bi directional iterators no index access
+Efficient insertion in any position (Double-Linked List). Lower efficiency in bulk operations. Requires member function call for sort etc. Only bi directional iterators no index access
 \begin{center}
     \includegraphics[scale=0.43]{list.png}
 \end{center}
 \subsubsection{std::forward\_list$<$T$>$ $\rightarrow$ \#include$<$forward\_list$>$}
-Efficient insertion AFTER any position, but clumsy with iterator to get \dq before\dq position. Only forward iterators, clumsy to search and remove, use member functions not algorithms.
+Efficient insertion AFTER any position, but clumsy with iterator to get \dq before\dq position (Singly-Linked List). Only forward iterators, clumsy to search and remove, use member functions not algorithms.
 \begin{center}
     \includegraphics[scale=0.45]{forward_list}
 \end{center}
@@ -63,12 +63,12 @@ Uses std::deque (or std::vector) and limits its functionality to stack operation
 \subsubsection{std::set $\rightarrow$ \#include $<$set$>$}
 \begin{itemize}
     \item std::set$<$int$>$ values$\{$7, 1, 4, 3, 2, 5, 6$\}$
-    \item Stores elements in sorted order (ascending by default)
+    \item Stores elements in sorted order (ascending by default, overwritten by 2nd template parameter)
     \item Iteration walks over the elements in order
     \item Member functions to check if element exists: .find(element) or .count(element)
 \end{itemize}
 \subsubsection{std::map $\rightarrow$ \#include $<$map$>$}
-Stores key-value pairs in sorted order. Default: By key ascending.\\
+Stores key-value pairs in sorted order. Default: By key ascending (Overwritten by 3rd template param).\\
 Use .first() for key and .second() for value.
 \begin{center}
     \includegraphics[scale=0.45]{map.png}

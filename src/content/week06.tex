@@ -44,14 +44,14 @@ void g(two::type_two) { /* ... */ } /* 5 */          g(t2) // Function 5
 \end{itemize}
 
 \begin{lstlisting}[style=frame, style= linenumbers, language=C]
-// Unscoped enumeration
+// Unscoped enumeration, leaks into surrounding scope
 enum DayOfWeek {
     Mon, Tue, Wed, Thu, Fri, Sat, Sun
 };   0    1    2    3    4    5    6
 // Implicit conversion:
 int day = Sun;
 
-// Scoped enumeration (class keyword)
+// Scoped enumeration (class keyword), requires DayOfWeek::
 enum class DayOfWeek {
     Mon, Tue, Wed, Thu, Fri, Sat, Sun
 };   0    1    2    3    4    5    6

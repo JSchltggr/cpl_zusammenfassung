@@ -61,7 +61,7 @@ logical_or<> (||)                           equal_to<> (==)
 \begin{itemize}
     \item transform: Lambda, function or functor for map
     \item merge: ranges must to be sorted
-    \item remove/erase: Remove does not actually delete element, it moves the not-removed elements to the front
+    \item remove/erase: Remove does not actually delete element, it moves the not-removed elements to the front. To get rid of \textit{removed} elements, usually \textit{erease} is called
     \item accumulate: Sums elements that are addable (+ operator)
     \item \_if versions: Take a predicate (instead of value) to provide a condition
     \item \_n versions: algorithm is related to a number (e.g: instead of last iterator)

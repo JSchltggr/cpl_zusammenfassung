@@ -58,11 +58,13 @@ class Date {
 public:
     Date(int year, int month, int day);
     Date(); // Default-Constructor
+    Date() = default; // explizit Default-Constructor
     Date(Date const &); // Copy-Constructor
     Date(Date &&); // Move-Constructor
     explicit Date(std::string const &); // Typeconversation-Constructor
     Date(std::initializer_list<Element> elements); // Initializer List-Constructor
     ~Date(); // Destructor
+    Date(Date const &) = delete; // delete implicit Copy-Constructor
 };
 \end{lstlisting}
 
