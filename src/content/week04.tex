@@ -61,6 +61,24 @@ int main() {
     applyAndPrint(1.5, multiply);
 \end{lstlisting}
 
+\subsubsection{Lambda Function Syntax}
+\begin{itemize}
+    \item auto const for function variable from Lambda
+    \item $[$ $]$ introduces a Lambda function. Can contain = and \& to access variables from scope.
+    \item are by default immutable (value/reference cannot be changed)
+\end{itemize}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+// Capturing a local variable by value
+int x = 5;
+auto l = [x]() mutable { std::cout << x++; };
+// Capturing a local variable by reference
+int x = 5;
+auto const l = [&x]() { std::cout << x++ };
+// Capturing all local variables by value or reference
+int x = 5;
+auto l = [=]() mutable { std::cout << x++ };
+\end{lstlisting}
+
 \subsection{Failing Functions}
 What should you do, if a function cannot fulfill its purpose?
 \begin{itemize}

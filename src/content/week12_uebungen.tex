@@ -1,7 +1,13 @@
 %! Author = phili
 %! Date = 27/12/2020
 
-\subsection{Übungen Woche 11}
+\subsection{Übungen Woche 12}
+\begin{itemize}
+	\item Konstruktoren werden ALLE aufgerufen
+	\item Destruktoren werden in umgekehrter Reihenfolge aufgerufen
+	\item Copy-Constructor nur für Value-Kopien. $\rightarrow$ Nur static type copy Constructor wird ausgeführt (Slicing kann auftreten)
+	\item Referenz-Kopie ruft \textbf{keinen} Konstruktor/Destruktor auf
+\end{itemize}
 
 \begin{lstlisting}[style=frame, style= linenumbers, language=C]
 struct monster{

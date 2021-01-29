@@ -1,0 +1,28 @@
+%! Author = joels
+%! Date = 29/01/2021
+
+\subsection{Übungen Woche 05}
+\subsubsection{Operatoren}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+class Date {
+    int year, month, day; //private
+public:
+    bool operator<(Date const & rhs) const;
+};
+
+inline bool operator>(Date const & lhs, Date const & rhs) {
+    return rhs < lhs;
+}
+inline bool operator>=(Date const & lhs, Date const & rhs) {
+    return !(lhs < rhs);
+}
+inline bool operator<=(Date const & lhs, Date const & rhs) {
+    return !(rhs < lhs);
+}
+inline bool operator==(Date const & lhs, Date const & rhs) {
+    return !(lhs < rhs ) && !(rhs < lhs);
+}
+inline bool operator!=(Date const & lhs, Date const & rhs) {
+    return !(lhs == rhs);
+}
+\end{lstlisting}
