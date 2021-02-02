@@ -1,0 +1,200 @@
+%! Author = joels
+%! Date = 02/02/2021
+
+\subsection{Testat2: KWIC}
+
+\subsubsection{word.h}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#ifndef WORD_H_
+#define WORD_H_
+
+#include <algorithm>
+#include <cctype>
+#include <iosfwd>
+#include <string>
+
+namespace text {
+
+class Word {
+	std::string value{"word"};
+
+public:
+	Word() = default;
+	explicit Word(std::string);
+	std::istream & read(std::istream &is);
+	std::ostream & print(std::ostream &os) const;
+	bool operator<(Word const & other) const {
+
+	return std::lexicographical_compare(value.begin(), value.end(), other.value.begin(), other.value.end(), [](char c1, char c2) {
+		return tolower(c1) < tolower(c2);
+		});
+	}
+
+};
+
+inline std::istream & operator>>(std::istream & is, Word & word) {
+    return word.read(is);
+}
+inline std::ostream& operator <<(std::ostream &os, Word const &word) {
+	return word.print(os);
+}
+
+inline bool operator>(Word const & word1, Word const & word2){
+	return word2 < word1;
+}
+
+inline bool operator>=(Word const & word1, Word const & word2){
+	return !(word1 < word2);
+}
+
+inline bool operator<=(Word const & word1, Word const & word2){
+	return !(word2 < word1);
+}
+
+inline bool operator==(Word const & word1, Word const & word2){
+	return !(word1 < word2) && !(word2 < word1);
+}
+
+inline bool operator!=(Word const & word1, Word const & word2){
+	return !(word1 == word2);
+}
+
+}
+
+#endif /* WORD_H_ */
+\end{lstlisting}
+
+\subsubsection{word.cpp}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#include "word.h"
+#include <istream>
+#include <stdexcept>
+#include <string>
+#include <algorithm>
+#include <cctype>
+#include <exception>
+
+namespace text {
+
+Word::Word(std::string value)
+: value(value) {
+	if (value.empty()) {
+		throw std::invalid_argument{"Invalid Argument"};
+	}
+	std::for_each(value.begin(), value.end(), [](char const c) {
+		if (!std::isalpha(c)) {
+			throw std::invalid_argument{"Invalid Argument"};
+		}
+	});
+}
+
+std::istream & Word::read(std::istream & is) {
+    std::string value{};
+    char c{};
+
+    while(!std::isalpha(is.peek()) && is.good()) {
+    	is.ignore(1);
+    	if (is.eof()) {
+    		is.setstate(std::ios::failbit);
+    		break;
+    	}
+    }
+    while(std::isalpha(is.peek())) {
+    	is >> c;
+    	value += c;
+    }
+
+    try {
+        Word input{value};
+        (*this) = input;
+    } catch(std::exception const & e) {
+        is.setstate(std::ios::failbit);
+    }
+    return is;
+}
+
+std::ostream & Word::print(std::ostream & on) const {
+    return on << value;
+}
+
+}
+\end{lstlisting}
+
+\subsubsection{kwic.h}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#ifndef SRC_KWIC_H_
+#define SRC_KWIC_H_
+
+#include "word.h" //Die Includes könnten reduziert werden, wenn die Hilfsfunktionen hier nicht deklariert wären
+#include <iosfwd>
+#include <vector>
+
+namespace text {
+using wordVector = std::vector<Word>;
+
+void kwic(std::istream &in, std::ostream &out); //Gut
+
+//Die Hilfsfunktionen sind ein Implementationsdetail und sollten nicht im Header deklariert werden (sofern nicht getestet)
+std::vector<wordVector> createCombinations(std::vector<wordVector>);
+
+void print(wordVector const line, std::ostream &out);
+
+}
+
+
+#endif /* SRC_KWIC_H_ */
+\end{lstlisting}
+\subsubsection{kwic.cpp}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#include "kwic.h" //Gut, eigener Include zuerst
+#include "word.h"
+#include <istream> //Gut
+#include <algorithm>
+#include <sstream>
+#include <string>
+#include <vector>
+
+namespace text {
+using wordVector = std::vector<Word>; //Ein besserer Name wäre line
+
+void kwic(std::istream &in, std::ostream &out) {
+	//Das Einlesen könnte auch in eine eigene Funktion ausgelagert werden
+	std::string lineStr{};
+	std::vector<wordVector>lines{};
+	while(std::getline(in, lineStr)) { //Gut
+		std::istringstream is{lineStr};
+		Word word{};
+		wordVector line{}; //Die Variable könnte direkt mit einem Iterator-Paar initialisiert werden
+		while (is >> word) {
+			line.push_back(word);
+		}
+		lines.push_back(line);
+	}
+	std::vector<wordVector> combinations = createCombinations(lines);
+	std::sort(combinations.begin(), combinations.end());
+
+	std::for_each(combinations.begin(), combinations.end(), [&out] (auto line) {
+		print(line, out);
+	});
+
+}
+
+std::vector<wordVector> createCombinations(std::vector<wordVector> inputLines) { //Rotations
+	std::vector<wordVector> combinations{};
+	std::for_each(inputLines.begin(), inputLines.end(), [&combinations] (wordVector line) {
+		for (unsigned i = 0; i < line.size(); i++) { //Ok
+			combinations.push_back(line);
+			std::rotate(line.begin(), line.begin() + 1, line.end());
+		}
+	});
+	return combinations;
+}
+
+void print(std::vector<Word> const line, std::ostream &out) {
+	std::for_each(line.begin(), line.end(), [&out] (Word word){ //Hier könnte besser mit dem copy-Algorithmus gearbeitet werden.
+
+		out << word << " ";
+	});
+	out << "\n";
+}
+\end{lstlisting}

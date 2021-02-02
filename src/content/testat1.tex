@@ -1,0 +1,190 @@
+%! Author = joels
+%! Date = 02/02/2021
+
+\subsection{Testat1: 7 SEGMENT}
+\subsubsection{sevensegment.h}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#ifndef SEVENSEGMENT_H_
+#define SEVENSEGMENT_H_
+
+#include <iosfwd>
+
+void printLargeDigit(int i, std::ostream &out);
+void printLargeNumber(int i, std::ostream &out);
+void printLargeError(std::ostream &out);
+
+#endif /* SEVENSEGMENT_H_ */
+\end{lstlisting}
+
+\subsubsection{sevensegment.cpp}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#include "sevensegment.h"
+#include <ostream>
+#include <array>
+#include <string>
+#include <algorithm>
+#include <iterator>
+
+const std::array<std::array<std::string, 5>, 11> digits{{
+	{{" - ", "| |", "   ", "| |", " - "}}, //0
+	{{"   ", "  |", "   ", "  |", "   "}}, //1
+	{{" - ", "  |", " - ", "|  ", " - "}}, //2
+	{{" - ", "  |", " - ", "  |", " - "}}, //3
+	{{"   ", "| |", " - ", "  |", "   "}}, //4
+	{{" - ", "|  ", " - ", "  |", " - "}}, //5
+	{{" - ", "|  ", " - ", "| |", " - "}}, //6
+	{{" - ", "  |", "   ", "  |", "   "}}, //7
+	{{" - ", "| |", " - ", "| |", " - "}}, //8
+	{{" - ", "| |", " - ", "  |", " - "}}, //9
+	{{"   ", "   ", " - ", "   ", "   "}}  //-
+}};
+
+const std::array<std::string, 5> error {{ //ALF ist wohl nicht so happy, da einiges an whitespace fehlt
+	{" -"},
+	{"|"},
+	{" -  -  -  -  -"},
+	{"|  |  |  | ||"},
+	{" -        -"}
+}};
+
+//Gut
+void printLargeDigit(const int i, std::ostream &out) {
+	//Es sollte noch geprüft werden, ob i im Range von 0 bis 9 ist
+	std::copy(digits.at(i).begin(), digits.at(i).end(), std::ostream_iterator<std::string>{out, "\n"});
+}
+
+//Gut gelöst
+void printLargeNumber(int i, std::ostream &out) {
+    std::array<std::string, 5> lines{};
+    std::string s = std::to_string(i);
+    for(auto digit : s) {
+    	int number{};
+    	if (digit == '-') {
+    		number = 10;
+    	}
+    	else {
+    		number = digit - '0';
+    	}
+        for(unsigned i = 0; i < lines.size(); i++) {
+            lines.at(i) += digits.at(number).at(i);
+        }
+    }
+    std::copy(lines.begin(), lines.end(), std::ostream_iterator<std::string>{out, "\n"});
+}
+//Sehr gut gelöst
+void printLargeError(std::ostream &out) {
+	std::copy(error.begin(), error.end(), std::ostream_iterator<std::string>{out, "\n"});
+}
+\end{lstlisting}
+
+\subsubsection{calc.h}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#ifndef SRC_CALC_H_
+#define SRC_CALC_H_
+
+#include <iosfwd> //Minimaler Include: Korrekt
+
+int calc(int first, int second, char opr);
+int calc(std::istream & in);
+
+#endif /* SRC_CALC_H_ */
+\end{lstlisting}
+
+\subsubsection{calc.cpp}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#include "calc.h" //Gut: Eigener Include zuerst
+#include <exception> //Includes sind korrekt
+#include <istream>
+#include <stdexcept>
+
+int calc(int const number1, int const number2, char const symbol) {
+	switch (symbol) {
+		case '+':
+			return number1 + number2;
+		case '-':
+			return number1 - number2;
+		case '*':
+			return number1 * number2;
+		case '/':
+			if (number2 == 0) {
+				//std::invalid_argument passt als Exception besser
+				throw std::overflow_error("Divide By Zero Exception"); //Auch Exceptions mit {} initialisiseren.
+			}
+			return number1 / number2;
+		case '%':
+			if (number2 == 0) {
+				throw std::overflow_error("Modulo By Zero Exception");
+			}
+			return number1 % number2;
+		default:
+			throw std::overflow_error("Invalid Operator Exception");
+	}
+}
+
+int calc(std::istream & in) {
+	int number1{};
+	char op{};
+	int number2{};
+	//Gut mit dem Stream-State gearbeitet
+	if (in >> number1 >> op >> number2) {
+		return calc(number1, number2, op);
+	}
+	else {
+		throw std::exception(); //Dies ist sehr generisch. Auch Exceptions mit {} initialisiseren.
+	}
+}
+\end{lstlisting}
+
+\subsubsection{pocketcalculator.h}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#ifndef POCKETCALCULATOR_H_
+#define POCKETCALCULATOR_H_
+
+#include <iosfwd>
+void pocketcalculator(std::istream &, std::ostream&);
+
+#endif /* POCKETCALCULATOR_H_ */
+\end{lstlisting}
+
+\subsubsection{pocketcalculator.cpp}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#include "pocketcalculator.h" //Gut: Eigener Header zuerst
+#include "calc.h"
+#include "sevensegment.h"
+#include <ostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+
+void pocketcalculator(std::istream &in, std::ostream &out) {
+	std::string line{};
+	while(std::getline(in, line)) { //Hier sollten die Exceptions gefangen und Error ausgegeben werden
+		std::istringstream is{line};
+		int number = calc(is);
+		if (std::to_string(number).length() > 8) { //Die Magic Number sollte in eine Konstante ausgelagert werden
+			throw std::overflow_error("Too Large Result Exception");
+		}
+		printLargeNumber(number, out);
+	}
+}
+\end{lstlisting}
+
+\subsubsection{main.cpp}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+    #include "calc.h" //Braucht es hier nicht
+#include "pocketcalculator.h"
+#include "sevensegment.h" //Braucht es hier nicht
+#include <exception>
+#include <iostream>
+
+int main() {
+	while (std::cin) { //Hier sollte es nur den Aufruf von pocketcalculator() geben. Alles andere ist nicht testbar
+		try {
+			pocketcalculator(std::cin, std::cout);
+		}
+		catch (std::exception const &e) {
+			printLargeError(std::cout);
+		}
+	}
+}
+\end{lstlisting}

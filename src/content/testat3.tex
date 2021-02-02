@@ -1,0 +1,68 @@
+%! Author = joels
+%! Date = 02/02/2021
+
+\subsection{Testat3: Indexable Set}
+\subsubsection{indexableSet.h}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+#ifndef SRC_INDEXABLESET_H_ //Include Guard vorhanden
+#define SRC_INDEXABLESET_H_
+
+#include <functional> //Includes sind korrekt
+#include <set>
+#include <stdexcept>
+
+template <typename T, typename COMPARE=std::less<T>> //Template Deklaration ist korrekt
+class indexableSet :public std::set<T, COMPARE> { //Korrekt geerbt, es hätte auch direkt struct als Keyword verwendet werden können, da sowieso alles public ist
+	using indexableSetType = std::set<T, COMPARE>; //Guter Alias für Base-Class
+	using size_type = typename indexableSetType::size_type; //Ist nicht verwendet. Stattdessen hätte man einen index_type Alias machen können
+	using reference = typename indexableSetType::reference; //Ist nicht verwendet
+	using const_reference = typename indexableSetType::const_reference; //Gut
+	using indexableSetType :: indexableSetType; //Gut Konstruktoren geerbt
+
+public:
+	const_reference operator[] (int i) const { //
+		if (i >= (int) this -> size() || i < -(int) this -> size()) { //Besser static_cast als C-Style-Cast verwenden, size in eine lokale Variable auslagern, dann reduziert sich der duplizierte Code.
+			throw std::out_of_range("Index out of Range"); //Exceptions auch mit {} initialisieren
+		}
+
+		if (i >= 0) {
+			auto itr = this -> begin();
+			for (int j = 0; j < i; j++) { //Eigene Loops vermeiden. Hier besser mit next/advance arbeiten.
+				itr++;
+			}
+			return *itr;
+		}
+		else {
+			auto itr = this -> end();
+			for (int j = 0; j < -i; j++) { //Eigene Loops vermeiden. Hier besser mit next/advance arbeiten.
+				itr--;
+			}
+			return *itr;
+		}
+	}
+
+	const_reference at(int i) const { //Gut, an [] delegiert. Es wäre vom Code her schöner gewesen die Implementation in at() zu haben und diese in den anderen Funktionen aufzurufen.
+		return (*this)[i];
+	}
+
+	const_reference front() const { //Gut
+		return (*this)[0];
+	}
+
+	const_reference back() const {
+		return (*this)[this -> size() -1]; //Besser: Aufruf mit -1
+	}
+};
+
+#endif /* SRC_INDEXABLESET_H_ */
+\end{lstlisting}
+
+\subsubsection{test.cpp}
+\begin{lstlisting}[style=frame, style= linenumbers, language=C]
+struct caselessCompare {
+	bool operator ()(std::string const lhs, std::string const rhs) const {
+		return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), [](char c1, char c2) {
+			return tolower(c1) < tolower(c2);
+		});
+	} };
+\end{lstlisting}
